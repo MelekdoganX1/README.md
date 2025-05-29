@@ -1,0 +1,563 @@
+{
+ "cells": [
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "id": "2b0eba72-7cf9-467f-9e93-53a32719646e",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Requirement already satisfied: nltk in c:\\users\\melek\\anaconda3\\lib\\site-packages (3.9.1)\n",
+      "Requirement already satisfied: click in c:\\users\\melek\\anaconda3\\lib\\site-packages (from nltk) (8.1.7)\n",
+      "Requirement already satisfied: joblib in c:\\users\\melek\\anaconda3\\lib\\site-packages (from nltk) (1.4.2)\n",
+      "Requirement already satisfied: regex>=2021.8.3 in c:\\users\\melek\\anaconda3\\lib\\site-packages (from nltk) (2024.9.11)\n",
+      "Requirement already satisfied: tqdm in c:\\users\\melek\\anaconda3\\lib\\site-packages (from nltk) (4.66.5)\n",
+      "Requirement already satisfied: colorama in c:\\users\\melek\\anaconda3\\lib\\site-packages (from click->nltk) (0.4.6)\n"
+     ]
+    }
+   ],
+   "source": [
+    "!pip install nltk\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 2,
+   "id": "04af911c-7f84-4fe3-af35-54112a96fb7f",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[nltk_data] Downloading package punkt to\n",
+      "[nltk_data]     C:\\Users\\melek\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package punkt is already up-to-date!\n",
+      "[nltk_data] Downloading package stopwords to\n",
+      "[nltk_data]     C:\\Users\\melek\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package stopwords is already up-to-date!\n",
+      "[nltk_data] Downloading package wordnet to\n",
+      "[nltk_data]     C:\\Users\\melek\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package wordnet is already up-to-date!\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 2,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "\n",
+    "import nltk\n",
+    "nltk.download('punkt')\n",
+    "nltk.download('stopwords')\n",
+    "nltk.download('wordnet')\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 3,
+   "id": "8aa625b4-0450-47ba-9ed0-6d54a5956c79",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "\n",
+    "import nltk\n",
+    "from nltk.tokenize import word_tokenize, sent_tokenize\n",
+    "from nltk.corpus import stopwords\n",
+    "from nltk.stem import WordNetLemmatizer, PorterStemmer\n",
+    "from nltk.tokenize import sent_tokenize\n",
+    "from nltk.tokenize import sent_tokenize\n",
+    "\n",
+    "import csv\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 4,
+   "id": "9a39358f-40ba-439c-a8c9-076257803ae0",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "import pandas as pd\n",
+    "import re\n",
+    "import string"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 5,
+   "id": "788a9420-c9ed-4ade-a46c-912507b0bc44",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/html": [
+       "<div>\n",
+       "<style scoped>\n",
+       "    .dataframe tbody tr th:only-of-type {\n",
+       "        vertical-align: middle;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe tbody tr th {\n",
+       "        vertical-align: top;\n",
+       "    }\n",
+       "\n",
+       "    .dataframe thead th {\n",
+       "        text-align: right;\n",
+       "    }\n",
+       "</style>\n",
+       "<table border=\"1\" class=\"dataframe\">\n",
+       "  <thead>\n",
+       "    <tr style=\"text-align: right;\">\n",
+       "      <th></th>\n",
+       "      <th>Question</th>\n",
+       "      <th>Key_Answer</th>\n",
+       "      <th>Student_Answer</th>\n",
+       "      <th>Label</th>\n",
+       "    </tr>\n",
+       "  </thead>\n",
+       "  <tbody>\n",
+       "    <tr>\n",
+       "      <th>0</th>\n",
+       "      <td>Explain how gravity affects objects on Earth.</td>\n",
+       "      <td>Gravity pulls objects toward the center of the...</td>\n",
+       "      <td>Gravity keeps us on the ground and makes thing...</td>\n",
+       "      <td>correct</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>1</th>\n",
+       "      <td>Describe the function of the heart in the huma...</td>\n",
+       "      <td>The heart pumps blood throughout the body, sup...</td>\n",
+       "      <td>It moves blood around so the body gets what it...</td>\n",
+       "      <td>correct</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>2</th>\n",
+       "      <td>Why is recycling important?</td>\n",
+       "      <td>Recycling reduces waste, conserves resources, ...</td>\n",
+       "      <td>It helps the Earth and stops trash from piling...</td>\n",
+       "      <td>correct</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>3</th>\n",
+       "      <td>Explain how gravity affects objects on Earth.</td>\n",
+       "      <td>Gravity pulls objects toward the center of the...</td>\n",
+       "      <td>Gravity keeps us on the ground and makes thing...</td>\n",
+       "      <td>correct</td>\n",
+       "    </tr>\n",
+       "    <tr>\n",
+       "      <th>4</th>\n",
+       "      <td>Why is recycling important?</td>\n",
+       "      <td>Recycling reduces waste, conserves resources, ...</td>\n",
+       "      <td>It helps the Earth and stops trash from piling...</td>\n",
+       "      <td>correct</td>\n",
+       "    </tr>\n",
+       "  </tbody>\n",
+       "</table>\n",
+       "</div>"
+      ],
+      "text/plain": [
+       "                                            Question  \\\n",
+       "0      Explain how gravity affects objects on Earth.   \n",
+       "1  Describe the function of the heart in the huma...   \n",
+       "2                        Why is recycling important?   \n",
+       "3      Explain how gravity affects objects on Earth.   \n",
+       "4                        Why is recycling important?   \n",
+       "\n",
+       "                                          Key_Answer  \\\n",
+       "0  Gravity pulls objects toward the center of the...   \n",
+       "1  The heart pumps blood throughout the body, sup...   \n",
+       "2  Recycling reduces waste, conserves resources, ...   \n",
+       "3  Gravity pulls objects toward the center of the...   \n",
+       "4  Recycling reduces waste, conserves resources, ...   \n",
+       "\n",
+       "                                      Student_Answer    Label  \n",
+       "0  Gravity keeps us on the ground and makes thing...  correct  \n",
+       "1  It moves blood around so the body gets what it...  correct  \n",
+       "2  It helps the Earth and stops trash from piling...  correct  \n",
+       "3  Gravity keeps us on the ground and makes thing...  correct  \n",
+       "4  It helps the Earth and stops trash from piling...  correct  "
+      ]
+     },
+     "execution_count": 5,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "df = pd.read_csv(\"C:/Users/melek/Downloads/large_student_answer_dataset.csv\")\n",
+    "df.head()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 6,
+   "id": "e5e7f228-6aa1-4f5f-ae8b-de5508555cc4",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Metin örneğimiz\n",
+    "text = \"Gravity keeps us on the ground. It affects all objects on Earth.\"\n",
+    "\n",
+    "# Cümlelere böl\n",
+    "sentences = sent_tokenize(text)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 7,
+   "id": "eaa44943-759f-4118-94d8-3b180fc59f68",
+   "metadata": {},
+   "outputs": [
+    {
+     "data": {
+      "text/plain": [
+       "['Gravity keeps us on the ground.', 'It affects all objects on Earth.']"
+      ]
+     },
+     "execution_count": 7,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    " #Cümlelere ayırma\n",
+    "sentences = sent_tokenize(text)\n",
+    "sentences[:10]"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 8,
+   "id": "fdacbca5-bcd6-4df3-bc6b-acf101bd8c85",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['having', 'both', \"they'd\", 'do', 'won', 'all', \"haven't\", 'it', 'hers', 'had', 'me', 'their', 'when', 'what', \"hadn't\", 'he', 'and', \"didn't\", \"he'll\", \"isn't\", \"wasn't\", 'm', 'a', 'has', \"you're\", 'themselves', \"won't\", 'doing', \"she'd\", \"you'll\", 'mightn', 'hadn', 't', 'yours', 'should', 'shan', \"shouldn't\", 'isn', 'been', \"he's\", 'i', 're', 'more', 'those', 'them', 'up', \"he'd\", 'have', \"aren't\", 'such']\n"
+     ]
+    }
+   ],
+   "source": [
+    "# Stopwords listesini almak\n",
+    "stop_words = set(stopwords.words('english')) # Stopwords listesini turkce almak␣\n",
+    "\n",
+    "stop_words_list = list(stop_words)\n",
+    "print(stop_words_list[:50])\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "id": "bb40e49d-d1d4-43b5-839e-d93d8c205d4b",
+   "metadata": {},
+   "source": [
+    "# Lemmatizer ve Stemmer'ı başlat\n",
+    "lemmatizer = WordNetLemmatizer()\n",
+    "stemmer = PorterStemmer()\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 9,
+   "id": "680136fe-45b3-42ce-bb08-360f26f915f7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "lemmatizer = WordNetLemmatizer()\n",
+    "stemmer = PorterStemmer()"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 10,
+   "id": "a3ebab53-dece-4630-bcd8-e06b75d265c5",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Kelimeleri tokenleştirip, lemmatize etme ve stemleme\n",
+    "def preprocess_sentence(sentence):\n",
+    "    tokens = word_tokenize(sentence)  # Cümleyi kelimelere ayır\n",
+    "    # Sadece harf olan kelimeleri al ve stopword'leri çıkar\n",
+    "    filtered_tokens = [token.lower() for token in tokens if token.isalpha() and token.lower() not in stop_words]\n",
+    "    \n",
+    "    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in filtered_tokens]  # Lemmatize etme\n",
+    "    stemmed_tokens = [stemmer.stem(token) for token in filtered_tokens]  # Stemleme\n",
+    "    \n",
+    "    return lemmatized_tokens, stemmed_tokens"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 11,
+   "id": "876dcd60-a680-4f0b-8cae-55c69ff7d46f",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Her cümleyi tokenleştir, lemmatize et ve stemle\n",
+    "tokenized_corpus_lemmatized = []\n",
+    "tokenized_corpus_stemmed = []"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 12,
+   "id": "6b346c5f-7aa9-4619-b19d-0ef7b77a9e17",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "for sentence in sentences:\n",
+    "    lemmatized_tokens, stemmed_tokens = preprocess_sentence(sentence)\n",
+    "    tokenized_corpus_lemmatized.append(lemmatized_tokens)\n",
+    "    tokenized_corpus_stemmed.append(stemmed_tokens)"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 13,
+   "id": "b807a459-42ed-4681-876c-34d80c67e738",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[nltk_data] Downloading package punkt to\n",
+      "[nltk_data]     C:\\Users\\melek\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package punkt is already up-to-date!\n",
+      "[nltk_data] Downloading package punkt_tab to\n",
+      "[nltk_data]     C:\\Users\\melek\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package punkt_tab is already up-to-date!\n"
+     ]
+    },
+    {
+     "data": {
+      "text/plain": [
+       "True"
+      ]
+     },
+     "execution_count": 13,
+     "metadata": {},
+     "output_type": "execute_result"
+    }
+   ],
+   "source": [
+    "import nltk\n",
+    "nltk.download('punkt')\n",
+    "nltk.download('punkt_tab')  # Bu eksik olan\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 14,
+   "id": "d4281ad5-5087-4b6a-b2ea-18c71c767fb2",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "['Gravity keeps us on the ground.', 'It affects all objects on Earth.']\n"
+     ]
+    },
+    {
+     "name": "stderr",
+     "output_type": "stream",
+     "text": [
+      "[nltk_data] Downloading package punkt to\n",
+      "[nltk_data]     C:\\Users\\melek\\AppData\\Roaming\\nltk_data...\n",
+      "[nltk_data]   Package punkt is already up-to-date!\n"
+     ]
+    }
+   ],
+   "source": [
+    "from nltk.tokenize import sent_tokenize\n",
+    "import nltk\n",
+    "\n",
+    "nltk.download('punkt')  # Ana model\n",
+    "\n",
+    "text = \"Gravity keeps us on the ground. It affects all objects on Earth.\"\n",
+    "sentences = sent_tokenize(text, language=\"english\")\n",
+    "print(sentences)\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 15,
+   "id": "9d74a2bd-e27f-4498-8e47-fe6c92c59fd7",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Kelimeleri tokenleştirip, lemmatize etme ve stemleme\n",
+    "def preprocess_sentence(sentence):\n",
+    "    tokens = word_tokenize(sentence)  # Cümleyi kelimelere ayır\n",
+    "    # Sadece harf olan kelimeleri al ve stopword'leri çıkar\n",
+    "    filtered_tokens = [token.lower() for token in tokens if token.isalpha() and token.lower() not in stop_words]\n",
+    "    \n",
+    "    lemmatized_tokens = [lemmatizer.lemmatize(token) for token in filtered_tokens]  # Lemmatize etme\n",
+    "    stemmed_tokens = [stemmer.stem(token) for token in filtered_tokens]  # Stemleme\n",
+    "    \n",
+    "    return lemmatized_tokens, stemmed_tokens"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 16,
+   "id": "4a1cc8f6-9368-4029-a87b-e77dd18bc601",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# lemmatize edılmıs cumlelerı bır csv dosyasına kaydedın.\n",
+    "with open(\"lemmatized_sentences.csv\", mode=\"w\", newline=\"\", encoding=\"utf-8\") as file:\n",
+    "    writer = csv.writer(file)\n",
+    "\n",
+    "    # Her cümleyi bir satır olarak yaz\n",
+    "    for tokens in tokenized_corpus_lemmatized:\n",
+    "        writer.writerow([' '.join(tokens)])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 17,
+   "id": "097f62cc-7967-41eb-8c64-05ef782f8262",
+   "metadata": {},
+   "outputs": [],
+   "source": [
+    "# Stem edılmıs cumlelerı bır csv dosyasına kaydedın.\n",
+    "with open(\"stemmed_sentences.csv\", mode=\"w\", newline=\"\", encoding=\"utf-8\") as file:\n",
+    "    writer = csv.writer(file)\n",
+    "\n",
+    "    # Her cümleyi bir satır olarak yaz\n",
+    "    for tokens in tokenized_corpus_stemmed:\n",
+    "        writer.writerow([' '.join(tokens)])"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 18,
+   "id": "8f8708a4-2a2c-440d-a36e-964203da1645",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Cümle sayısı: 2\n",
+      "Lemmatized token sayısı: 2\n",
+      "Stemmed token sayısı: 2\n"
+     ]
+    }
+   ],
+   "source": [
+    "print(\"Cümle sayısı:\", len(sentences))\n",
+    "print(\"Lemmatized token sayısı:\", len(tokenized_corpus_lemmatized))\n",
+    "print(\"Stemmed token sayısı:\", len(tokenized_corpus_stemmed))\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 19,
+   "id": "c78508f7-3959-482b-beb1-12c70db8d2d7",
+   "metadata": {},
+   "outputs": [
+    {
+     "name": "stdout",
+     "output_type": "stream",
+     "text": [
+      "Cümle 1 - Base: Gravity keeps us on the ground.\n",
+      "Cümle 1 - Lemmatized: ['gravity', 'keep', 'u', 'ground']\n",
+      "Cümle 1 - Stemmed: ['graviti', 'keep', 'us', 'ground']\n",
+      "\n",
+      "\n",
+      "Cümle 2 - Base: It affects all objects on Earth.\n",
+      "Cümle 2 - Lemmatized: ['affect', 'object', 'earth']\n",
+      "Cümle 2 - Stemmed: ['affect', 'object', 'earth']\n",
+      "\n",
+      "\n"
+     ]
+    }
+   ],
+   "source": [
+    "for i in range(len(sentences)):\n",
+    "    print(f\"Cümle {i+1} - Base: {sentences[i]}\")\n",
+    "    print(f\"Cümle {i+1} - Lemmatized: {tokenized_corpus_lemmatized[i]}\")\n",
+    "    print(f\"Cümle {i+1} - Stemmed: {tokenized_corpus_stemmed[i]}\")\n",
+    "    print(\"\\n\")\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "479cc229-7335-4989-91e8-b8e0d246d166",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "0cc7e69b-cc41-42ce-888b-99d0daaf19d1",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "312173c1-2a68-480a-9b28-4613faad8572",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "e3489150-ccb8-4101-ab73-84c2f0b61e37",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "id": "ea8644b8-d77b-4655-aebb-924ce05c3271",
+   "metadata": {},
+   "outputs": [],
+   "source": []
+  }
+ ],
+ "metadata": {
+  "kernelspec": {
+   "display_name": "Python 3 (ipykernel)",
+   "language": "python",
+   "name": "python3"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.12.7"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 5
+}
